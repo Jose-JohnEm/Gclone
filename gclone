@@ -1,5 +1,8 @@
 #!/bin/bash
 
+source ./gcl_check.sh
+source ./set_on_gcl.sh
+
 take_repo()
 {
     while [[ -z $repo ]] || [[  $repo != "github" &&  $repo != "blih" ]]; do
@@ -16,49 +19,17 @@ take_repo()
     done
 }
 
-check_default_user()
-{
-    while read -r line ; do
-        if [ -n $line ] && [ $line = "DEFAULT_USER:" ]; then
-            return 1
-        fi
-    done < $binaries
-    return 0
-}
-
-check_reccurent_users()
-{
-    while read -r line; do
-	if [[ -n $line  && $line = "RECCURENT_USERS:" ]]; then
-	    return 1
-	fi
-    done < $binaries
-    return 0
-}
-
 take_user()
 {
     read -p 'Entre le nom du propriétaire : ' user
     while [ -z $user ]; do
         echo -e '\nVeuillez entrer un nom\n'
         read -p 'Entre le nom du propriétaire : ' user
-    done; check_default_user
+    done
+    new_main_user
     if [ $? -eq 0 ]; then
-        read -p 'Voulez vous le mettre par défaut ? [o/n] ' ans
-        if [ -n $ans ] && [ $ans = 'o' ]; then
-	    echo -e "\n" >> $binaries
-	    sed -i "1iDEFAULT_USER:" $binaries
-	    sed -i "2i$lin$user" $binaries
-            echo -e "L'utilisateur par défaut est $user et le répertoire est $repo"
-        fi
+        new_reccurent_user
     fi
-    if [[ -z $ans ]] || [[ $ans != 'o' ]]; then
-	check_reccurent_users
-	if [ $? -eq 0 ]; then
-	    echo -e "RECCURENT_USERS:" >> $binaries
-	fi
-    fi
-    echo -e "$user" >> $binaries
 }
 
 take_project()
@@ -70,25 +41,9 @@ take_project()
     fi
 }
 
-check_files()
-{
-    binaries=~/.my_scripts/gcl/gcl_info
-    if ! [ -f '~/.my_scripts/gcl/gcl_info' ]; then
-        touch $binaries
-    fi
-}
-
-want_reset()
-{
-    if [[ $1 = "--reset" ]]; then
-	rm -rf $binaries
-	echo -e "Le fichier de configuration a été correctement supprimé"
-	exit
-    fi
-}
-
 check_files
 want_reset $1
+use_main_user $1
 take_repo
 take_user
 take_project
