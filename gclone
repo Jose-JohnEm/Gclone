@@ -2,6 +2,7 @@
 
 source ./gcl_bin/gcl_check.sh
 source ./gcl_bin/set_on_gcl.sh
+source ./gcl_bin/github_checker.sh
 
 take_repo()
 {
@@ -17,23 +18,6 @@ take_repo()
             echo -e "\nVeuillez entrer un Répertoire Valide\n"
         fi
     done
-}
-
-github_checker()
-{
-    if [[ $repo = "github" ]]; then
-        cu='https://github.com/'$user'?tab=repositories'
-        hr='<a href="/'$user'/'
-        echo $cu
-        echo $hr
-        curl $cu > url
-        cat url | grep "$hr" > project 
-        rm -rf url
-        
-        while read -r rp; do
-            tr -d $hr -d " "
-        done < project
-    fi
 }
 
 take_user()
