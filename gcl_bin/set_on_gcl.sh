@@ -1,4 +1,4 @@
-source ./gcl_check.sh
+source ./gcl_bin/gcl_check.sh
 
 for_trunc()
 {
